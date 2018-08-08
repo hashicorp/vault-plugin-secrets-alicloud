@@ -1,4 +1,4 @@
-# Vault Plugin: Google Cloud Platform Secrets Backend
+# Vault Plugin: AliCloud Platform Secrets Backend
 
 This is a backend plugin to be used with [Hashicorp Vault](https://www.github.com/hashicorp/vault).
 This plugin generates unique, ephemeral API keys and STS credentials.
