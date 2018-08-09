@@ -16,3 +16,4 @@
 
 # Ignore build files placed in the pkg directory
 pkg*
+bin*
