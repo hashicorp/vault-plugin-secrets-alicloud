@@ -106,16 +106,15 @@ $ vault secrets enable --plugin-name='alicloudsecrets' --path="alicloud" plugin
 
 ### Tests
 
-This plugin has [acceptance tests](https://en.wikipedia.org/wiki/Acceptance_testing) 
-covering most of the features of this secrets backend.
+This plugin has both integration tests, and acceptance tests. 
 
-If you are developing this plugin and want to verify it is still
-functioning (and you haven't broken anything else), we recommend
-running the acceptance tests.
+The integration tests are run by `$ make test` and rather than firing real
+API calls, they fire API calls at a local test server that returns expected
+responses.
 
-Acceptance tests typically require other environment variables to be set for
-things such as access keys. The test itself should error early and tell
-you what to set, so it is not documented here.
+The acceptance tests fire real API calls, and are located in `acceptance_test.go`.
+These should be run once as a final step before placing a PR. Please see 
+`acceptance_test.go` to learn the environment variables that will need to be set.
 
 **Warning:** The acceptance tests create/destroy/modify *real resources*,
 which may incur real costs in some cases. In the presence of a bug,
@@ -124,16 +123,11 @@ data behind. Therefore, please run the acceptance tests at your own risk.
 At the very least, we recommend running them in their own private
 account for whatever backend you're testing.
 
-To run the acceptance tests, invoke `make test`:
+To run the acceptance tests, after exporting the necessary environment variables, 
+from the home directory run `go test`:
 
 ```sh
-$ make test
-```
-
-You can also specify a `TESTARGS` variable to filter tests like so:
-
-```sh
-$ make test TESTARGS='--run=TestConfig'
+$ go test
 ```
 
 ## Other Docs
