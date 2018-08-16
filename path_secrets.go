@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/vault-plugin-secrets-alicloud/clients"
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
@@ -107,23 +108,33 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 		return nil, err
 	}
 
+	// On the first pass here, if we successfully delete an access key but fail later and return an
+	// error, we'll never again be able to progress past deleting the access key because it'll be
+	// gone, leaving dangling objects. So, even if we get an error, we still try to do the remaining
+	// things. Multierror flags whether to return an error or nil, and if it return any error we'll
+	// try again, but if it doesn't we know we're done.
+	apiErrs := multierror.Error{}
+
 	// Delete the access key first so if all else fails, the access key is revoked.
 	if err := client.DeleteAccessKey(userName, accessKeyID); err != nil {
-		return nil, err
+		apiErrs.Errors = append(apiErrs.Errors, err)
 	}
 
 	// Inline policies are currently stored as remote policies, because they have been
 	// instantiated remotely and we need their name and type to now detach and delete them.
 	inlinePolicies, err := getRemotePolicies(req.Secret.InternalData, "inline_policies")
 	if err != nil {
+		// This shouldn't be part of the multierror because if it returns empty inline policies,
+		// then we won't go through the inlinePolicies loop and we'll think we're successful
+		// when we actually didn't delete the inlinePolicies we need to.
 		return nil, err
 	}
 	for _, inlinePolicy := range inlinePolicies {
 		if err := client.DetachPolicy(userName, inlinePolicy.Name, inlinePolicy.Type); err != nil {
-			return nil, err
+			apiErrs.Errors = append(apiErrs.Errors, err)
 		}
 		if err := client.DeletePolicy(inlinePolicy.Name); err != nil {
-			return nil, err
+			apiErrs.Errors = append(apiErrs.Errors, err)
 		}
 	}
 
@@ -131,11 +142,14 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	// supposed to be longstanding.
 	remotePolicies, err := getRemotePolicies(req.Secret.InternalData, "remote_policies")
 	if err != nil {
+		// This shouldn't be part of the multierror because if it returns empty remote policies,
+		// then we won't go through the remotePolicies loop and we'll think we're successful
+		// when we actually didn't delete the remotePolicies we need to.
 		return nil, err
 	}
 	for _, remotePolicy := range remotePolicies {
 		if err := client.DetachPolicy(userName, remotePolicy.Name, remotePolicy.Type); err != nil {
-			return nil, err
+			apiErrs.Errors = append(apiErrs.Errors, err)
 		}
 	}
 
@@ -145,9 +159,9 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	// thing had been created. Luckily the err returned is pretty explanatory so that will
 	// help with debugging.
 	if err := client.DeleteUser(userName); err != nil {
-		return nil, err
+		apiErrs.Errors = append(apiErrs.Errors, err)
 	}
-	return nil, nil
+	return nil, apiErrs.ErrorOrNil()
 }
 
 func getStringValue(internalData map[string]interface{}, key string) (string, error) {
