@@ -2,12 +2,15 @@ package clients
 
 import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
-	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/sts"
 )
 
 func NewSTSClient(sdkConfig *sdk.Config, key, secret string) (*STSClient, error) {
-	client, err := sts.NewClientWithOptions("us-east-1", sdkConfig, credentials.NewAccessKeyCredential(key, secret))
+	creds, err := chainedCreds(key, secret)
+	if err != nil {
+		return nil, err
+	}
+	client, err := sts.NewClientWithOptions("us-east-1", sdkConfig, creds)
 	if err != nil {
 		return nil, err
 	}

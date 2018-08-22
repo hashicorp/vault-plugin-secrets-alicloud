@@ -2,13 +2,15 @@ package clients
 
 import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
-	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/ram"
 )
 
 func NewRAMClient(sdkConfig *sdk.Config, key, secret string) (*RAMClient, error) {
-	cred := credentials.NewAccessKeyCredential(key, secret)
-	client, err := ram.NewClientWithOptions("us-east-1", sdkConfig, cred)
+	creds, err := chainedCreds(key, secret)
+	if err != nil {
+		return nil, err
+	}
+	client, err := ram.NewClientWithOptions("us-east-1", sdkConfig, creds)
 	if err != nil {
 		return nil, err
 	}
