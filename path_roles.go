@@ -194,11 +194,17 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 		return nil, err
 	}
 
+	// Let's create a response that we're only going to return if there are warnings.
+	resp := &logical.Response{}
+	if role.isSTS() && (role.TTL > 0 || role.MaxTTL > 0) {
+		resp.AddWarning("role_arn is set so ttl and max_ttl will be ignored because they're not editable on STS tokens")
+		return resp, nil
+	}
 	if role.TTL > b.System().MaxLeaseTTL() {
-		resp := &logical.Response{}
 		resp.AddWarning(fmt.Sprintf("ttl of %d exceeds the system max ttl of %d, the latter will be used during login", role.TTL, b.System().MaxLeaseTTL()))
 		return resp, nil
 	}
+	// No warnings, let's return a 204.
 	return nil, nil
 }
 

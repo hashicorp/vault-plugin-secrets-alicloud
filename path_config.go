@@ -22,8 +22,8 @@ func (b *backend) pathConfig() *framework.Path {
 			},
 		},
 		Callbacks: map[logical.Operation]framework.OperationFunc{
-			logical.CreateOperation: b.operationConfigCreate,
-			logical.UpdateOperation: b.operationConfigCreate,
+			logical.CreateOperation: b.operationConfigCreateUpdate,
+			logical.UpdateOperation: b.operationConfigCreateUpdate,
 			logical.ReadOperation:   b.operationConfigRead,
 			logical.DeleteOperation: b.operationConfigDelete,
 		},
@@ -32,7 +32,7 @@ func (b *backend) pathConfig() *framework.Path {
 	}
 }
 
-func (b *backend) operationConfigCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) operationConfigCreateUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// Access keys and secrets are generated in pairs. You would never need
 	// to update one or the other alone, always both together.
 	accessKey := ""
@@ -86,8 +86,8 @@ func (b *backend) operationConfigDelete(ctx context.Context, req *logical.Reques
 	return nil, nil
 }
 
-func readCredentials(ctx context.Context, s logical.Storage) (*credConfig, error) {
-	entry, err := s.Get(ctx, "config")
+func readCredentials(ctx context.Context, storage logical.Storage) (*credConfig, error) {
+	entry, err := storage.Get(ctx, "config")
 	if err != nil {
 		return nil, err
 	}

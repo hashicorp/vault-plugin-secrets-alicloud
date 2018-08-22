@@ -72,15 +72,11 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		}, map[string]interface{}{
 			"is_sts": true,
 		})
-		if role.TTL != 0 {
-			resp.Secret.TTL = role.TTL
-		}
-		if role.MaxTTL != 0 {
-			resp.Secret.MaxTTL = role.MaxTTL
-		}
 
 		// Set the secret TTL to appropriately match the expiration of the token.
-		resp.Secret.TTL = expiration.Sub(time.Now())
+		ttl := expiration.Sub(time.Now())
+		resp.Secret.TTL = ttl
+		resp.Secret.MaxTTL = ttl
 
 		// STS credentials are purposefully short-lived and aren't renewable.
 		resp.Secret.Renewable = false
@@ -179,13 +175,17 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 			return nil, err
 		}
 		// This defer is also in this loop on purpose.
+		// Separate these strings from the remotePol pointer so the defer statement will retain the correct values
+		// due to pointer reuse for the remotePol var on each iteration of the loop.
+		remotePolName := remotePol.Name
+		remotePolType := remotePol.Type
 		defer func() {
 			if success {
 				return
 			}
-			if err := client.DetachPolicy(createUserResp.User.UserName, remotePol.Name, remotePol.Type); err != nil {
+			if err := client.DetachPolicy(createUserResp.User.UserName, remotePolName, remotePolType); err != nil {
 				if b.Logger().IsError() {
-					b.Logger().Error(fmt.Sprintf("unable to detach policy name:%s, type:%s from user:%s", remotePol.Name, remotePol.Type, createUserResp.User.UserName))
+					b.Logger().Error(fmt.Sprintf("unable to detach policy name:%s, type:%s from user:%s", remotePolName, remotePolType, createUserResp.User.UserName))
 				}
 			}
 		}()

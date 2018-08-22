@@ -230,8 +230,6 @@ func (e *testEnv) AddARNBasedRole(t *testing.T) {
 		Storage:   e.Storage,
 		Data: map[string]interface{}{
 			"role_arn": e.RoleARN,
-			"ttl":      1000,
-			"max_ttl":  1000,
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
@@ -272,13 +270,13 @@ func (e *testEnv) ReadARNBasedRole(t *testing.T) {
 	}
 
 	ttl := fmt.Sprintf("%d", resp.Data["ttl"])
-	if ttl != "1000" {
-		t.Fatalf("expected ttl of 1000 but received %s", ttl)
+	if ttl != "0" {
+		t.Fatalf("expected ttl of 0 but received %s", ttl)
 	}
 
 	maxTTL := fmt.Sprintf("%d", resp.Data["max_ttl"])
-	if maxTTL != "1000" {
-		t.Fatalf("expected max_ttl of 1000 but received %s", maxTTL)
+	if maxTTL != "0" {
+		t.Fatalf("expected max_ttl of 0 but received %s", maxTTL)
 	}
 }
 
@@ -289,7 +287,6 @@ func (e *testEnv) UpdateARNBasedRole(t *testing.T) {
 		Storage:   e.Storage,
 		Data: map[string]interface{}{
 			"role_arn": "acs:ram::5138828231865461:role/notrustedactors",
-			"ttl":      100,
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
@@ -330,12 +327,12 @@ func (e *testEnv) ReadUpdatedRole(t *testing.T) {
 	}
 
 	ttl := fmt.Sprintf("%d", resp.Data["ttl"])
-	if ttl != "100" {
+	if ttl != "0" {
 		t.Fatalf("expected ttl of 100 but received %s", ttl)
 	}
 
 	maxTTL := fmt.Sprintf("%d", resp.Data["max_ttl"])
-	if maxTTL != "1000" {
+	if maxTTL != "0" {
 		t.Fatalf("expected max_ttl of 1000 but received %s", maxTTL)
 	}
 }
