@@ -22,8 +22,9 @@ func (b *backend) pathConfig() *framework.Path {
 			},
 		},
 		Callbacks: map[logical.Operation]framework.OperationFunc{
-			logical.CreateOperation: b.operationConfigCreateUpdate,
-			logical.UpdateOperation: b.operationConfigCreateUpdate,
+			logical.CreateOperation: b.operationConfigCreate,
+			// Update is not supported because you would never need to update
+			// an access key without also updating the secret key.
 			logical.ReadOperation:   b.operationConfigRead,
 			logical.DeleteOperation: b.operationConfigDelete,
 		},
@@ -32,7 +33,7 @@ func (b *backend) pathConfig() *framework.Path {
 	}
 }
 
-func (b *backend) operationConfigCreateUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) operationConfigCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// Access keys and secrets are generated in pairs. You would never need
 	// to update one or the other alone, always both together.
 	accessKey := ""

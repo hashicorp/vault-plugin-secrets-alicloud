@@ -32,17 +32,17 @@ func (b *backend) pathSecrets() *framework.Secret {
 }
 
 func (b *backend) operationRenew(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	if isSTSRaw, ok := req.Secret.InternalData["is_sts"]; !ok {
+	isSTSRaw, ok := req.Secret.InternalData["is_sts"]
+	if !ok {
 		return nil, errors.New("is_sts missing from secret")
-	} else {
-		isSTS, ok := isSTSRaw.(bool)
-		if !ok {
-			return nil, fmt.Errorf("unable to read is_sts: %+v", isSTSRaw)
-		}
-		if isSTS {
-			// STS already has a lifetime, and we don't support renewing it.
-			return nil, nil
-		}
+	}
+	isSTS, ok := isSTSRaw.(bool)
+	if !ok {
+		return nil, fmt.Errorf("unable to read is_sts: %+v", isSTSRaw)
+	}
+	if isSTS {
+		// STS already has a lifetime, and we don't support renewing it.
+		return nil, nil
 	}
 
 	roleName, err := getStringValue(req.Secret.InternalData, "role_name")
@@ -72,18 +72,18 @@ func (b *backend) operationRenew(ctx context.Context, req *logical.Request, data
 }
 
 func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *framework.FieldData) (*logical.Response, error) {
-	if isSTSRaw, ok := req.Secret.InternalData["is_sts"]; !ok {
+	isSTSRaw, ok := req.Secret.InternalData["is_sts"]
+	if !ok {
 		return nil, errors.New("is_sts missing from secret")
-	} else {
-		isSTS, ok := isSTSRaw.(bool)
-		if !ok {
-			return nil, fmt.Errorf("unable to read is_sts: %+v", isSTSRaw)
-		}
-		if isSTS {
-			// STS cleans up after itself so we can skip this if is_sts internal data
-			// element set to true.
-			return nil, nil
-		}
+	}
+	isSTS, ok := isSTSRaw.(bool)
+	if !ok {
+		return nil, fmt.Errorf("unable to read is_sts: %+v", isSTSRaw)
+	}
+	if isSTS {
+		// STS cleans up after itself so we can skip this if is_sts internal data
+		// element set to true.
+		return nil, nil
 	}
 
 	creds, err := readCredentials(ctx, req.Storage)
