@@ -238,7 +238,7 @@ func generateUsername(displayName, roleName string) string {
 	// The time and random number take up to 15 more in length, so if the username
 	// is too long we need to trim it.
 	if len(username) > 49 {
-		username = username[0:49]
+		username = username[:49]
 	}
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	return fmt.Sprintf("%s%d-%d", username, time.Now().Unix(), r.Intn(10000))
@@ -249,7 +249,7 @@ Generate an API key or STS credential using the given role's configuration.'
 `
 
 const pathCredsHelpDesc = `
-This path will generate a new, never before used API key or STS credential for
+This path will generate a new API key or STS credential for
 accessing AliCloud. The RAM policies used to back this key pair will be
 configured on the role. For example, if this backend is mounted at "alicloud",
 then "alicloud/creds/deploy" would generate access keys for the "deploy" role.
