@@ -10,6 +10,8 @@ func NewSTSClient(sdkConfig *sdk.Config, key, secret string) (*STSClient, error)
 	if err != nil {
 		return nil, err
 	}
+	// We hard-code a region here because there's only one RAM endpoint regardless of the
+	// region you're in.
 	client, err := sts.NewClientWithOptions("us-east-1", sdkConfig, creds)
 	if err != nil {
 		return nil, err

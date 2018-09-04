@@ -10,6 +10,8 @@ func NewRAMClient(sdkConfig *sdk.Config, key, secret string) (*RAMClient, error)
 	if err != nil {
 		return nil, err
 	}
+	// We hard-code a region here because there's only one RAM endpoint regardless of the
+	// region you're in.
 	client, err := ram.NewClientWithOptions("us-east-1", sdkConfig, creds)
 	if err != nil {
 		return nil, err
@@ -31,10 +33,8 @@ func (c *RAMClient) DeleteAccessKey(userName, accessKeyID string) error {
 	req := ram.CreateDeleteAccessKeyRequest()
 	req.UserAccessKeyId = accessKeyID
 	req.UserName = userName
-	if _, err := c.client.DeleteAccessKey(req); err != nil {
-		return err
-	}
-	return nil
+	_, err := c.client.DeleteAccessKey(req)
+	return err
 }
 
 func (c *RAMClient) CreatePolicy(policyName, policyDoc string) (*ram.CreatePolicyResponse, error) {
@@ -48,10 +48,8 @@ func (c *RAMClient) CreatePolicy(policyName, policyDoc string) (*ram.CreatePolic
 func (c *RAMClient) DeletePolicy(policyName string) error {
 	req := ram.CreateDeletePolicyRequest()
 	req.PolicyName = policyName
-	if _, err := c.client.DeletePolicy(req); err != nil {
-		return err
-	}
-	return nil
+	_, err := c.client.DeletePolicy(req)
+	return err
 }
 
 func (c *RAMClient) AttachPolicy(userName, policyName, policyType string) error {
@@ -59,10 +57,8 @@ func (c *RAMClient) AttachPolicy(userName, policyName, policyType string) error 
 	attachPolReq.UserName = userName
 	attachPolReq.PolicyName = policyName
 	attachPolReq.PolicyType = policyType
-	if _, err := c.client.AttachPolicyToUser(attachPolReq); err != nil {
-		return err
-	}
-	return nil
+	_, err := c.client.AttachPolicyToUser(attachPolReq)
+	return err
 }
 
 func (c *RAMClient) DetachPolicy(userName, policyName, policyType string) error {
@@ -70,10 +66,8 @@ func (c *RAMClient) DetachPolicy(userName, policyName, policyType string) error 
 	req.UserName = userName
 	req.PolicyName = policyName
 	req.PolicyType = policyType
-	if _, err := c.client.DetachPolicyFromUser(req); err != nil {
-		return err
-	}
-	return nil
+	_, err := c.client.DetachPolicyFromUser(req)
+	return err
 }
 
 func (c *RAMClient) CreateUser(userName string) (*ram.CreateUserResponse, error) {
@@ -88,8 +82,6 @@ func (c *RAMClient) CreateUser(userName string) (*ram.CreateUserResponse, error)
 func (c *RAMClient) DeleteUser(userName string) error {
 	req := ram.CreateDeleteUserRequest()
 	req.UserName = userName
-	if _, err := c.client.DeleteUser(req); err != nil {
-		return err
-	}
-	return nil
+	_, err := c.client.DeleteUser(req)
+	return err
 }

@@ -2,9 +2,9 @@ package alicloud
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/vault/helper/jsonutil"
 	"math/rand"
 	"time"
 
@@ -124,7 +124,7 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		// it is using the policy name alone.
 		policyName := createUserResp.User.UserName + "-" + inlinePolicy.UUID
 
-		policyDoc, err := json.Marshal(inlinePolicy.PolicyDocument)
+		policyDoc, err := jsonutil.EncodeJSON(inlinePolicy.PolicyDocument)
 		if err != nil {
 			return nil, err
 		}

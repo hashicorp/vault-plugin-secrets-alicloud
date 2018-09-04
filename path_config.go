@@ -22,9 +22,12 @@ func (b *backend) pathConfig() *framework.Path {
 			},
 		},
 		Callbacks: map[logical.Operation]framework.OperationFunc{
-			logical.CreateOperation: b.operationConfigCreate,
-			// Update is not supported because you would never need to update
-			// an access key without also updating the secret key.
+			// There's no existence check because you would never need to simply update your access key and
+			// secret. They're generated together at the same time, so you always need to clobber your previous
+			// ones. We support both create and update operations here anyways because create enables a normal
+			// CLI experience (using "write"), and update enables a normal API experience (using "POST").
+			logical.CreateOperation: b.operationConfigCreateUpdate,
+			logical.UpdateOperation: b.operationConfigCreateUpdate,
 			logical.ReadOperation:   b.operationConfigRead,
 			logical.DeleteOperation: b.operationConfigDelete,
 		},
@@ -33,7 +36,7 @@ func (b *backend) pathConfig() *framework.Path {
 	}
 }
 
-func (b *backend) operationConfigCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) operationConfigCreateUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// Access keys and secrets are generated in pairs. You would never need
 	// to update one or the other alone, always both together.
 	accessKey := ""
@@ -70,9 +73,7 @@ func (b *backend) operationConfigRead(ctx context.Context, req *logical.Request,
 		return nil, nil
 	}
 
-	// NOTE:
-	// "secret_key" is intentionally not returned by this endpoint,
-	// as we lean away from returning sensitive information unless it's absolutely necessary.
+	// "secret_key" is intentionally not returned by this endpoint
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"access_key": creds.AccessKey,
