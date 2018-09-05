@@ -113,11 +113,11 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	// gone, leaving dangling objects. So, even if we get an error, we still try to do the remaining
 	// things. Multierror flags whether to return an error or nil, and if it return any error we'll
 	// try again, but if it doesn't we know we're done.
-	apiErrs := multierror.Error{}
+	apiErrs := &multierror.Error{}
 
 	// Delete the access key first so if all else fails, the access key is revoked.
 	if err := client.DeleteAccessKey(userName, accessKeyID); err != nil {
-		apiErrs.Errors = append(apiErrs.Errors, err)
+		apiErrs = multierror.Append(apiErrs, err)
 	}
 
 	// Inline policies are currently stored as remote policies, because they have been
@@ -131,10 +131,10 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	}
 	for _, inlinePolicy := range inlinePolicies {
 		if err := client.DetachPolicy(userName, inlinePolicy.Name, inlinePolicy.Type); err != nil {
-			apiErrs.Errors = append(apiErrs.Errors, err)
+			apiErrs = multierror.Append(apiErrs, err)
 		}
 		if err := client.DeletePolicy(inlinePolicy.Name); err != nil {
-			apiErrs.Errors = append(apiErrs.Errors, err)
+			apiErrs = multierror.Append(apiErrs, err)
 		}
 	}
 
@@ -149,7 +149,7 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	}
 	for _, remotePolicy := range remotePolicies {
 		if err := client.DetachPolicy(userName, remotePolicy.Name, remotePolicy.Type); err != nil {
-			apiErrs.Errors = append(apiErrs.Errors, err)
+			apiErrs = multierror.Append(apiErrs, err)
 		}
 	}
 
@@ -159,7 +159,7 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 	// thing had been created. Luckily the err returned is pretty explanatory so that will
 	// help with debugging.
 	if err := client.DeleteUser(userName); err != nil {
-		apiErrs.Errors = append(apiErrs.Errors, err)
+		apiErrs = multierror.Append(apiErrs, err)
 	}
 	return nil, apiErrs.ErrorOrNil()
 }

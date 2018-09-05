@@ -180,10 +180,8 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 		if len(role.InlinePolicies) > 0 {
 			return nil, errors.New("inline_policies must be blank when an arn is present")
 		}
-	} else {
-		if len(role.InlinePolicies)+len(role.RemotePolicies) == 0 {
-			return nil, errors.New("must include an arn, or at least one of inline_policies or remote_policies")
-		}
+	} else if len(role.InlinePolicies)+len(role.RemotePolicies) == 0 {
+		return nil, errors.New("must include an arn, or at least one of inline_policies or remote_policies")
 	}
 
 	entry, err := logical.StorageEntryJSON("role/"+roleName, role)
@@ -198,7 +196,6 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 	resp := &logical.Response{}
 	if role.isSTS() && (role.TTL > 0 || role.MaxTTL > 0) {
 		resp.AddWarning("role_arn is set so ttl and max_ttl will be ignored because they're not editable on STS tokens")
-		return resp, nil
 	}
 	if role.TTL > b.System().MaxLeaseTTL() {
 		resp.AddWarning(fmt.Sprintf("ttl of %d exceeds the system max ttl of %d, the latter will be used during login", role.TTL, b.System().MaxLeaseTTL()))
