@@ -199,6 +199,8 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 	}
 	if role.TTL > b.System().MaxLeaseTTL() {
 		resp.AddWarning(fmt.Sprintf("ttl of %d exceeds the system max ttl of %d, the latter will be used during login", role.TTL, b.System().MaxLeaseTTL()))
+	}
+	if len(resp.Warnings) > 0 {
 		return resp, nil
 	}
 	// No warnings, let's return a 204.

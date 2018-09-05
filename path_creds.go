@@ -139,9 +139,7 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 			Type: createPolicyResp.Policy.PolicyType,
 		}
 
-		// This defer is in this loop on purpose. It wouldn't be appropriate
-		// to call the defer on each iteration, because we won't know until
-		// afterwards whether we've been successful.
+		// This defer is in this loop on purpose.
 		defer func() {
 			if success {
 				return
