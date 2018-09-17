@@ -32,6 +32,10 @@ func (b *backend) pathCreds() *framework.Path {
 
 func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	roleName := data.Get("name").(string)
+	if roleName == "" {
+		return nil, errors.New("name is required")
+	}
+
 	role, err := readRole(ctx, req.Storage, roleName)
 	if err != nil {
 		return nil, err

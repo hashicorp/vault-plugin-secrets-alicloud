@@ -80,6 +80,9 @@ func (b *backend) operationRoleExistenceCheck(ctx context.Context, req *logical.
 
 func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	roleName := data.Get("name").(string)
+	if roleName == "" {
+		return nil, errors.New("name is required")
+	}
 
 	role, err := readRole(ctx, req.Storage, roleName)
 	if err != nil {
@@ -197,7 +200,12 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 }
 
 func (b *backend) operationRoleRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	role, err := readRole(ctx, req.Storage, data.Get("name").(string))
+	roleName := data.Get("name").(string)
+	if roleName == "" {
+		return nil, errors.New("name is required")
+	}
+
+	role, err := readRole(ctx, req.Storage, roleName)
 	if err != nil {
 		return nil, err
 	}
