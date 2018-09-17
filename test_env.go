@@ -27,7 +27,7 @@ type testEnv struct {
 
 func (e *testEnv) AddConfig(t *testing.T) {
 	req := &logical.Request{
-		Operation: logical.CreateOperation,
+		Operation: logical.UpdateOperation,
 		Path:      "config",
 		Storage:   e.Storage,
 		Data: map[string]interface{}{
@@ -67,7 +67,7 @@ func (e *testEnv) ReadFirstConfig(t *testing.T) {
 
 func (e *testEnv) UpdateConfig(t *testing.T) {
 	req := &logical.Request{
-		Operation: logical.CreateOperation,
+		Operation: logical.UpdateOperation,
 		Path:      "config",
 		Storage:   e.Storage,
 		Data: map[string]interface{}{
