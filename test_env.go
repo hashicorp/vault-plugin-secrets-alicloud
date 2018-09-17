@@ -36,8 +36,8 @@ func (e *testEnv) AddConfig(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -51,8 +51,8 @@ func (e *testEnv) ReadFirstConfig(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -76,8 +76,8 @@ func (e *testEnv) UpdateConfig(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -91,8 +91,8 @@ func (e *testEnv) ReadSecondConfig(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -112,8 +112,8 @@ func (e *testEnv) DeleteConfig(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -127,8 +127,8 @@ func (e *testEnv) ReadEmptyConfig(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -146,8 +146,8 @@ func (e *testEnv) AddPolicyBasedRole(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -161,8 +161,8 @@ func (e *testEnv) ReadPolicyBasedRole(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -233,8 +233,8 @@ func (e *testEnv) AddARNBasedRole(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -248,8 +248,8 @@ func (e *testEnv) ReadARNBasedRole(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -290,8 +290,8 @@ func (e *testEnv) UpdateARNBasedRole(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -305,8 +305,8 @@ func (e *testEnv) ReadUpdatedRole(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -344,8 +344,8 @@ func (e *testEnv) ListTwoRoles(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -369,8 +369,8 @@ func (e *testEnv) DeleteARNBasedRole(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -384,8 +384,8 @@ func (e *testEnv) ListOneRole(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -406,8 +406,8 @@ func (e *testEnv) ReadPolicyBasedCreds(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -432,8 +432,8 @@ func (e *testEnv) RenewPolicyBasedCreds(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -453,8 +453,8 @@ func (e *testEnv) RevokePolicyBasedCreds(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -468,8 +468,8 @@ func (e *testEnv) ReadARNBasedCreds(t *testing.T) {
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp == nil {
 		t.Fatal("expected a response")
@@ -500,8 +500,8 @@ func (e *testEnv) RenewARNBasedCreds(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
@@ -518,8 +518,8 @@ func (e *testEnv) RevokeARNBasedCreds(t *testing.T) {
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
-	if err != nil {
-		t.Fatal(err)
+	if err != nil || (resp != nil && resp.IsError()) {
+		t.Fatalf("bad: resp: %#v\nerr:%v", resp, err)
 	}
 	if resp != nil {
 		t.Fatal("expected nil response to represent a 204")
