@@ -49,7 +49,9 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		return nil, errors.New("unable to create secret because no credentials are configured")
 	}
 
-	if role.isSTS() {
+	switch role.Type() {
+
+	case roleTypeSTS:
 		client, err := clients.NewSTSClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
 		if err != nil {
 			return nil, err
@@ -70,7 +72,7 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 			"security_token": assumeRoleResp.Credentials.SecurityToken,
 			"expiration":     expiration,
 		}, map[string]interface{}{
-			"is_sts": true,
+			"role_type": roleTypeSTS.String(),
 		})
 
 		// Set the secret TTL to appropriately match the expiration of the token.
@@ -81,154 +83,158 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		// STS credentials are purposefully short-lived and aren't renewable.
 		resp.Secret.Renewable = false
 		return resp, nil
-	}
 
-	client, err := clients.NewRAMClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
-	if err != nil {
-		return nil, err
-	}
-
-	/*
-		Now we're embarking upon a multi-step process that could fail at any time.
-		If it does, let's do our best to clean up after ourselves. Success will be
-		our flag at the end indicating whether we should leave things be, or clean
-		things up, based on how we exit this method. Since defer statements are
-		last-in-first-out, it will perfectly reverse the order of everything just
-		like we need.
-	*/
-	success := false
-
-	createUserResp, err := client.CreateUser(generateUsername(req.DisplayName, roleName))
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if success {
-			return
-		}
-		if err := client.DeleteUser(createUserResp.User.UserName); err != nil {
-			if b.Logger().IsError() {
-				b.Logger().Error(fmt.Sprintf("unable to delete user %s", createUserResp.User.UserName), err)
-			}
-		}
-	}()
-
-	// We need to gather up all the names and types of the remote policies we're
-	// about to create so we can detach and delete them later.
-	inlinePolicies := make([]*remotePolicy, len(role.InlinePolicies))
-
-	for i, inlinePolicy := range role.InlinePolicies {
-
-		// By combining the userName with the particular policy's UUID,
-		// it'll be possible to figure out who this policy is for and which one
-		// it is using the policy name alone. The max length of a policy name is
-		// 128, but given the max lengths of our username and inline policy UUID,
-		// we will always remain well under that here.
-		policyName := createUserResp.User.UserName + "-" + inlinePolicy.UUID
-
-		policyDoc, err := jsonutil.EncodeJSON(inlinePolicy.PolicyDocument)
+	case roleTypeRAM:
+		client, err := clients.NewRAMClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
 		if err != nil {
 			return nil, err
 		}
 
-		createPolicyResp, err := client.CreatePolicy(policyName, string(policyDoc))
+		/*
+			Now we're embarking upon a multi-step process that could fail at any time.
+			If it does, let's do our best to clean up after ourselves. Success will be
+			our flag at the end indicating whether we should leave things be, or clean
+			things up, based on how we exit this method. Since defer statements are
+			last-in-first-out, it will perfectly reverse the order of everything just
+			like we need.
+		*/
+		success := false
+
+		createUserResp, err := client.CreateUser(generateUsername(req.DisplayName, roleName))
 		if err != nil {
 			return nil, err
 		}
-
-		inlinePolicies[i] = &remotePolicy{
-			Name: createPolicyResp.Policy.PolicyName,
-			Type: createPolicyResp.Policy.PolicyType,
-		}
-
-		// This defer is in this loop on purpose.
 		defer func() {
 			if success {
 				return
 			}
-			if err := client.DeletePolicy(createPolicyResp.Policy.PolicyName); err != nil {
+			if err := client.DeleteUser(createUserResp.User.UserName); err != nil {
 				if b.Logger().IsError() {
-					b.Logger().Error(fmt.Sprintf("unable to delete policy %s", createPolicyResp.Policy.PolicyName), err)
+					b.Logger().Error(fmt.Sprintf("unable to delete user %s", createUserResp.User.UserName), err)
 				}
 			}
 		}()
 
-		if err := client.AttachPolicy(createUserResp.User.UserName, createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType); err != nil {
+		// We need to gather up all the names and types of the remote policies we're
+		// about to create so we can detach and delete them later.
+		inlinePolicies := make([]*remotePolicy, len(role.InlinePolicies))
+
+		for i, inlinePolicy := range role.InlinePolicies {
+
+			// By combining the userName with the particular policy's UUID,
+			// it'll be possible to figure out who this policy is for and which one
+			// it is using the policy name alone. The max length of a policy name is
+			// 128, but given the max lengths of our username and inline policy UUID,
+			// we will always remain well under that here.
+			policyName := createUserResp.User.UserName + "-" + inlinePolicy.UUID
+
+			policyDoc, err := jsonutil.EncodeJSON(inlinePolicy.PolicyDocument)
+			if err != nil {
+				return nil, err
+			}
+
+			createPolicyResp, err := client.CreatePolicy(policyName, string(policyDoc))
+			if err != nil {
+				return nil, err
+			}
+
+			inlinePolicies[i] = &remotePolicy{
+				Name: createPolicyResp.Policy.PolicyName,
+				Type: createPolicyResp.Policy.PolicyType,
+			}
+
+			// This defer is in this loop on purpose.
+			defer func() {
+				if success {
+					return
+				}
+				if err := client.DeletePolicy(createPolicyResp.Policy.PolicyName); err != nil {
+					if b.Logger().IsError() {
+						b.Logger().Error(fmt.Sprintf("unable to delete policy %s", createPolicyResp.Policy.PolicyName), err)
+					}
+				}
+			}()
+
+			if err := client.AttachPolicy(createUserResp.User.UserName, createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType); err != nil {
+				return nil, err
+			}
+			// This defer is also in this loop on purpose.
+			defer func() {
+				if success {
+					return
+				}
+				if err := client.DetachPolicy(createUserResp.User.UserName, createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType); err != nil {
+					if b.Logger().IsError() {
+						b.Logger().Error(fmt.Sprintf(
+							"unable to detach policy name:%s, type:%s from user:%s", createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType, createUserResp.User.UserName))
+					}
+				}
+			}()
+		}
+
+		for _, remotePol := range role.RemotePolicies {
+			if err := client.AttachPolicy(createUserResp.User.UserName, remotePol.Name, remotePol.Type); err != nil {
+				return nil, err
+			}
+			// This defer is also in this loop on purpose.
+			// Separate these strings from the remotePol pointer so the defer statement will retain the correct values
+			// due to pointer reuse for the remotePol var on each iteration of the loop.
+			remotePolName := remotePol.Name
+			remotePolType := remotePol.Type
+			defer func() {
+				if success {
+					return
+				}
+				if err := client.DetachPolicy(createUserResp.User.UserName, remotePolName, remotePolType); err != nil {
+					if b.Logger().IsError() {
+						b.Logger().Error(fmt.Sprintf("unable to detach policy name:%s, type:%s from user:%s", remotePolName, remotePolType, createUserResp.User.UserName))
+					}
+				}
+			}()
+		}
+
+		accessKeyResp, err := client.CreateAccessKey(createUserResp.User.UserName)
+		if err != nil {
 			return nil, err
 		}
-		// This defer is also in this loop on purpose.
+		// It's unlikely we wouldn't have success at this point because there are no further errors returned below, but
+		// there could be a panic if somehow one of the objects below were missing a pointer, so let's play it safe and
+		// add a defer rolling back the access key if that happens.
 		defer func() {
 			if success {
 				return
 			}
-			if err := client.DetachPolicy(createUserResp.User.UserName, createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType); err != nil {
+			if err := client.DeleteAccessKey(createUserResp.User.UserName, accessKeyResp.AccessKey.AccessKeyId); err != nil {
 				if b.Logger().IsError() {
-					b.Logger().Error(fmt.Sprintf(
-						"unable to detach policy name:%s, type:%s from user:%s", createPolicyResp.Policy.PolicyName, createPolicyResp.Policy.PolicyType, createUserResp.User.UserName))
+					b.Logger().Error(fmt.Sprintf("unable to delete access key for username:%s", createUserResp.User.UserName))
 				}
 			}
 		}()
-	}
 
-	for _, remotePol := range role.RemotePolicies {
-		if err := client.AttachPolicy(createUserResp.User.UserName, remotePol.Name, remotePol.Type); err != nil {
-			return nil, err
+		resp := b.Secret(secretType).Response(map[string]interface{}{
+			"access_key": accessKeyResp.AccessKey.AccessKeyId,
+			"secret_key": accessKeyResp.AccessKey.AccessKeySecret,
+		}, map[string]interface{}{
+			"role_type":       roleTypeRAM.String(),
+			"role_name":       roleName,
+			"username":        createUserResp.User.UserName,
+			"access_key_id":   accessKeyResp.AccessKey.AccessKeyId,
+			"inline_policies": inlinePolicies,
+			"remote_policies": role.RemotePolicies,
+		})
+		if role.TTL != 0 {
+			resp.Secret.TTL = role.TTL
 		}
-		// This defer is also in this loop on purpose.
-		// Separate these strings from the remotePol pointer so the defer statement will retain the correct values
-		// due to pointer reuse for the remotePol var on each iteration of the loop.
-		remotePolName := remotePol.Name
-		remotePolType := remotePol.Type
-		defer func() {
-			if success {
-				return
-			}
-			if err := client.DetachPolicy(createUserResp.User.UserName, remotePolName, remotePolType); err != nil {
-				if b.Logger().IsError() {
-					b.Logger().Error(fmt.Sprintf("unable to detach policy name:%s, type:%s from user:%s", remotePolName, remotePolType, createUserResp.User.UserName))
-				}
-			}
-		}()
-	}
-
-	accessKeyResp, err := client.CreateAccessKey(createUserResp.User.UserName)
-	if err != nil {
-		return nil, err
-	}
-	// It's unlikely we wouldn't have success at this point because there are no further errors returned below, but
-	// there could be a panic if somehow one of the objects below were missing a pointer, so let's play it safe and
-	// add a defer rolling back the access key if that happens.
-	defer func() {
-		if success {
-			return
+		if role.MaxTTL != 0 {
+			resp.Secret.MaxTTL = role.MaxTTL
 		}
-		if err := client.DeleteAccessKey(createUserResp.User.UserName, accessKeyResp.AccessKey.AccessKeyId); err != nil {
-			if b.Logger().IsError() {
-				b.Logger().Error(fmt.Sprintf("unable to delete access key for username:%s", createUserResp.User.UserName))
-			}
-		}
-	}()
 
-	resp := b.Secret(secretType).Response(map[string]interface{}{
-		"access_key": accessKeyResp.AccessKey.AccessKeyId,
-		"secret_key": accessKeyResp.AccessKey.AccessKeySecret,
-	}, map[string]interface{}{
-		"role_name":       roleName,
-		"is_sts":          false,
-		"username":        createUserResp.User.UserName,
-		"access_key_id":   accessKeyResp.AccessKey.AccessKeyId,
-		"inline_policies": inlinePolicies,
-		"remote_policies": role.RemotePolicies,
-	})
-	if role.TTL != 0 {
-		resp.Secret.TTL = role.TTL
-	}
-	if role.MaxTTL != 0 {
-		resp.Secret.MaxTTL = role.MaxTTL
-	}
+		success = true
+		return resp, nil
 
-	success = true
-	return resp, nil
+	default:
+		return nil, fmt.Errorf("unsupported role type: %s", role.Type())
+	}
 }
 
 // The max length of a username per AliCloud is 64.

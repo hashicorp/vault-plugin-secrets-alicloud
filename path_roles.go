@@ -173,7 +173,7 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 	if role.MaxTTL > 0 && role.TTL > role.MaxTTL {
 		return nil, errors.New("ttl exceeds max_ttl")
 	}
-	if role.isSTS() {
+	if role.Type() == roleTypeSTS {
 		if len(role.RemotePolicies) > 0 {
 			return nil, errors.New("remote_policies must be blank when an arn is present")
 		}
@@ -194,7 +194,7 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 
 	// Let's create a response that we're only going to return if there are warnings.
 	resp := &logical.Response{}
-	if role.isSTS() && (role.TTL > 0 || role.MaxTTL > 0) {
+	if role.Type() == roleTypeSTS && (role.TTL > 0 || role.MaxTTL > 0) {
 		resp.AddWarning("role_arn is set so ttl and max_ttl will be ignored because they're not editable on STS tokens")
 	}
 	if role.TTL > b.System().MaxLeaseTTL() {
@@ -256,6 +256,35 @@ func readRole(ctx context.Context, s logical.Storage, roleName string) (*roleEnt
 	return result, nil
 }
 
+type roleType int
+
+const (
+	roleTypeUnknown roleType = iota
+	roleTypeRAM
+	roleTypeSTS
+)
+
+func parseRoleType(nameOfRoleType string) (roleType, error) {
+	switch nameOfRoleType {
+	case "ram":
+		return roleTypeRAM, nil
+	case "sts":
+		return roleTypeSTS, nil
+	default:
+		return roleTypeUnknown, fmt.Errorf("received unknown role type: %s", nameOfRoleType)
+	}
+}
+
+func (t roleType) String() string {
+	switch t {
+	case roleTypeRAM:
+		return "ram"
+	case roleTypeSTS:
+		return "sts"
+	}
+	return "unknown"
+}
+
 type roleEntry struct {
 	RoleARN        string          `json:"role_arn"`
 	RemotePolicies []*remotePolicy `json:"remote_policies"`
@@ -264,8 +293,11 @@ type roleEntry struct {
 	MaxTTL         time.Duration   `json:"max_ttl"`
 }
 
-func (r *roleEntry) isSTS() bool {
-	return r.RoleARN != ""
+func (r *roleEntry) Type() roleType {
+	if r.RoleARN != "" {
+		return roleTypeSTS
+	}
+	return roleTypeRAM
 }
 
 // Policies don't have ARNs and instead, their unique combination of their name and type comprise
