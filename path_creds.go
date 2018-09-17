@@ -121,7 +121,9 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 
 		// By combining the userName with the particular policy's UUID,
 		// it'll be possible to figure out who this policy is for and which one
-		// it is using the policy name alone.
+		// it is using the policy name alone. The max length of a policy name is
+		// 128, but given the max lengths of our username and inline policy UUID,
+		// we will always remain well under that here.
 		policyName := createUserResp.User.UserName + "-" + inlinePolicy.UUID
 
 		policyDoc, err := jsonutil.EncodeJSON(inlinePolicy.PolicyDocument)
