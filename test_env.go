@@ -380,7 +380,7 @@ func (e *testEnv) DeleteARNBasedRole(t *testing.T) {
 func (e *testEnv) ListOneRole(t *testing.T) {
 	req := &logical.Request{
 		Operation: logical.ListOperation,
-		Path:      "roles",
+		Path:      "role",
 		Storage:   e.Storage,
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)

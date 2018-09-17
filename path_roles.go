@@ -13,20 +13,9 @@ import (
 	"github.com/hashicorp/vault/logical/framework"
 )
 
-func (b *backend) pathListRole() *framework.Path {
-	return &framework.Path{
-		Pattern: "role/?$",
-		Callbacks: map[logical.Operation]framework.OperationFunc{
-			logical.ListOperation: b.operationRolesList,
-		},
-		HelpSynopsis:    pathListRolesHelpSyn,
-		HelpDescription: pathListRolesHelpDesc,
-	}
-}
-
 func (b *backend) pathListRoles() *framework.Path {
 	return &framework.Path{
-		Pattern: "roles/?$",
+		Pattern: "role/?$",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
 			logical.ListOperation: b.operationRolesList,
 		},

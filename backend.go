@@ -32,7 +32,6 @@ func newBackend(sdkConfig *sdk.Config) logical.Backend {
 		Paths: []*framework.Path{
 			b.pathConfig(),
 			b.pathRole(),
-			b.pathListRole(),
 			b.pathListRoles(),
 			b.pathCreds(),
 		},
