@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ca434ab0bb896342ec8d84471d5ed9b70ac55fabf7ea365d352a39e4467e398e"
+  digest = "1:e26170d7ec7d444d7b74a5b1dbd6437fd8e552d27efce9327f733311737c4ae9"
   name = "github.com/SermoDigital/jose"
   packages = [
     ".",
@@ -15,12 +15,13 @@
   revision = "803625baeddc3526d01d321b5066029f53eafc81"
 
 [[projects]]
-  digest = "1:58b62b2e70c7948611296c72448d81a6a3083f81d4584ae3ecab4cafb337b83d"
+  digest = "1:309704ec478c46e59bc84e0968ce7ab3707cef00c26c1f1bc058e3d1d26afadb"
   name = "github.com/aliyun/alibaba-cloud-sdk-go"
   packages = [
     "sdk",
     "sdk/auth",
     "sdk/auth/credentials",
+    "sdk/auth/credentials/providers",
     "sdk/auth/signers",
     "sdk/endpoints",
     "sdk/errors",
@@ -31,8 +32,8 @@
     "services/sts",
   ]
   pruneopts = "UT"
-  revision = "c3d886725a300a08a5868cb2b477e8bae0f1e2ca"
-  version = "1.24.6"
+  revision = "ef9535c490beb6b59620d93f6c7ba88e9b3b1ad0"
+  version = "1.26.2"
 
 [[projects]]
   digest = "1:9fd3a6ab34bb103ba228eefd044d3f9aa476237ea95a46d12e8cccd3abf3fea2"
@@ -42,7 +43,7 @@
   revision = "1fca145dffbcaa8fe914309b1ec0cfc67500fe61"
 
 [[projects]]
-  digest = "1:cb22af0ed7c72d495d8be1106233ee553898950f15fd3f5404406d44c2e86888"
+  digest = "1:17fe264ee908afc795734e8c4e63db2accabaf57326dbf21763a7d6b86096260"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -119,7 +120,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:35e9b9d8a799b6d4d4196f19cba3b0ffabf3c96b43eaedf388263d033c066616"
+  digest = "1:45aad874d3c7d5e8610427c81870fb54970b981692930ec2a319ce4cb89d7a00"
   name = "github.com/hashicorp/go-rootcerts"
   packages = ["."]
   pruneopts = "UT"
@@ -161,7 +162,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8951fe6e358876736d8fa1f3992624fdbb2dec6bc49401c1381d1ef8abbb544f"
+  digest = "1:12247a2e99a060cc692f6680e5272c8adf0b8f572e6bce0d7095e624c958a240"
   name = "github.com/hashicorp/hcl"
   packages = [
     ".",
@@ -178,7 +179,7 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
-  digest = "1:7ebd6df5df45cd76f5ad71fd2131a1708ef9dc95224cd5423a3eb1d2ff84ed77"
+  digest = "1:4be4315ec4768c829b2bc87c7e28dbb2420e831e242770d845833c13bb658d70"
   name = "github.com/hashicorp/vault"
   packages = [
     "api",
@@ -297,7 +298,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:696ade937a19f51ee9fb0ecbecfe7e87698c3b45b552449397bf311f5694f466"
+  digest = "1:2131278c6fb9a84f2da205d35fdace38c530c2f9394342c52476cb4d23b50ffb"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -319,7 +320,7 @@
   revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [[projects]]
-  digest = "1:7509ba4347d1f8de6ae9be8818b0cd1abc3deeffe28aeaf4be6d4b6b5178d9ca"
+  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -358,7 +359,7 @@
   revision = "383e8b2c3b9e36c4076b235b32537292176bae20"
 
 [[projects]]
-  digest = "1:5b691d5473935824bb0084acc1aef393509fb490f72f118f29692e23028043a8"
+  digest = "1:5c64b5dd01a6d9dbcf4c160b9a36996605c79f39b46ea7570b3d861dbc71f641"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -398,10 +399,12 @@
   analyzer-version = 1
   input-imports = [
     "github.com/aliyun/alibaba-cloud-sdk-go/sdk",
-    "github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials",
+    "github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth",
+    "github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials/providers",
     "github.com/aliyun/alibaba-cloud-sdk-go/services/ram",
     "github.com/aliyun/alibaba-cloud-sdk-go/services/sts",
     "github.com/hashicorp/go-hclog",
+    "github.com/hashicorp/go-multierror",
     "github.com/hashicorp/go-uuid",
     "github.com/hashicorp/vault/helper/pluginutil",
     "github.com/hashicorp/vault/logical",
