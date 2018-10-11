@@ -4,7 +4,7 @@ require (
 	cloud.google.com/go v0.26.0 // indirect
 	github.com/client9/misspell v0.3.4
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/golang/lint v0.0.0-20180702182130-06c8688daad7
+	github.com/golang/lint v0.0.0-20181011170945-5906bd5c48cd
 	github.com/golang/mock v1.1.1
 	github.com/golang/protobuf v1.2.0
 	github.com/kisielk/gotool v1.0.0 // indirect
