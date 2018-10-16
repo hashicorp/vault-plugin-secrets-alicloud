@@ -16,6 +16,6 @@ require (
 	golang.org/x/text v0.3.0 // indirect
 	golang.org/x/tools v0.0.0-20180828015842-6cd1fcedba52
 	google.golang.org/appengine v1.1.0 // indirect
-	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
+	google.golang.org/genproto v0.0.0-20181016171552-94acd270e44e
 	honnef.co/go/tools v0.0.0-20180728063816-88497007e858
 )
