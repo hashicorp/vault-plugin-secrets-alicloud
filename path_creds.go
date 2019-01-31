@@ -246,7 +246,7 @@ func generateUsername(displayName, roleName string) string {
 	return generateName(displayName, roleName, 64)
 }
 
-// The max length of a username per AliCloud is 32.
+// The max length of a role session name per AliCloud is 32.
 func generateRoleSessionName(displayName, roleName string) string {
 	return generateName(displayName, roleName, 32)
 }
