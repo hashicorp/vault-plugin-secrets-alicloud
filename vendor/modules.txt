@@ -1,4 +1,4 @@
-# github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190412020505-60e2075261b6
+# github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190416171258-6ec9d6f324d9
 github.com/aliyun/alibaba-cloud-sdk-go/sdk
 github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth
 github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials/providers

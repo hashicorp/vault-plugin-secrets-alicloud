@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190412020505-60e2075261b6 h1:5RwdKFlGKokYBbq4M2ZZ0LzfxdK4e1L4rwQH+76wPkE=
 github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190412020505-60e2075261b6/go.mod h1:T9M45xf79ahXVelWoOBmH0y4aC1t5kXO5BxwyakgIGA=
+github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190416171258-6ec9d6f324d9 h1:HCyz63BH1gAtdgixMRfxYph8NjfbizmtiNHixBFpu8s=
+github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190416171258-6ec9d6f324d9/go.mod h1:T9M45xf79ahXVelWoOBmH0y4aC1t5kXO5BxwyakgIGA=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310 h1:BUAU3CGlLvorLI26FmByPp2eC2qla6E1Tw+scpcg/to=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
