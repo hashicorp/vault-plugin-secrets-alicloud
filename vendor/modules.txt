@@ -1,4 +1,4 @@
-# github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190412020505-60e2075261b6
+# github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190603121130-57a2ce229fb6
 github.com/aliyun/alibaba-cloud-sdk-go/sdk
 github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth
 github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials/providers
@@ -108,8 +108,6 @@ github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
 # github.com/ryanuber/go-glob v1.0.0
 github.com/ryanuber/go-glob
-# github.com/satori/go.uuid v1.2.0
-github.com/satori/go.uuid
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/pbkdf2
