@@ -11,5 +11,5 @@ require (
 	github.com/hashicorp/vault/sdk v0.1.12-0.20190621032639-b2bd2690d46a
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
+	google.golang.org/appengine v1.6.1 // indirect
 )
