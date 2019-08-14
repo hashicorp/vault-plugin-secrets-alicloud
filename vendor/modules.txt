@@ -89,7 +89,7 @@ github.com/hashicorp/vault/sdk/helper/cryptoutil
 github.com/hashicorp/yamux
 # github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 github.com/jmespath/go-jmespath
-# github.com/json-iterator/go v1.1.6
+# github.com/json-iterator/go v1.1.7
 github.com/json-iterator/go
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
