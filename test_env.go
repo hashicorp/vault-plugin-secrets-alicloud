@@ -12,9 +12,9 @@ import (
 )
 
 /*
-	testEnv allows us to reuse the same requests and response-checking
-	for both integration tests that don't hit Alibaba's real API, and
-	for acceptance tests that do hit their real API.
+testEnv allows us to reuse the same requests and response-checking
+for both integration tests that don't hit Alibaba's real API, and
+for acceptance tests that do hit their real API.
 */
 type testEnv struct {
 	AccessKey string
