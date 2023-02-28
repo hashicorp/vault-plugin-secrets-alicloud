@@ -87,12 +87,14 @@ Start a Vault server with this config file:
 $ vault server -config=path/to/config.json ...
 ```
 
-Once the server is started, register the plugin in the Vault server's [plugin catalog](https://www.vaultproject.io/docs/internals/plugins.html#plugin-catalog):
+Once the server is started, register the plugin in the Vault server's [plugin catalog](https://developer.hashicorp.com/vault/docs/plugins/plugin-architecture#plugin-catalog):
 
 ```sh
-$ vault write sys/plugins/catalog/alicloudsecrets \
-        sha_256="$(shasum -a 256 path/to/plugin/directory/vault-plugin-secrets-alicloud | cut -d " " -f1)" \
-        command="vault-plugin-secrets-alicloud"
+$ vault plugin register \
+        -sha256="$(shasum -a 256 path/to/plugin/directory/vault-plugin-secrets-alicloud | cut -d " " -f1)" \
+        -command="vault-plugin-secrets-alicloud" \
+        secret \
+        alicloudsecrets
 ```
 
 Any name can be substituted for the plugin name "alicloudsecrets". This
@@ -106,7 +108,7 @@ $ vault secrets enable --plugin-name='alicloudsecrets' --path="alicloud" plugin
 
 ### Tests
 
-This plugin has both integration tests, and acceptance tests. 
+This plugin has both integration tests, and acceptance tests.
 
 The integration tests are run by `$ make test` and rather than firing real
 API calls, they fire API calls at a local test server that returns expected
