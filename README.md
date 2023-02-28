@@ -92,6 +92,7 @@ Once the server is started, register the plugin in the Vault server's [plugin ca
 ```sh
 $ vault plugin register \
         -sha256="$(shasum -a 256 path/to/plugin/directory/vault-plugin-secrets-alicloud | cut -d " " -f1)" \
+        -command="vault-plugin-secrets-alicloud" \
         secret \
         alicloudsecrets
 ```
