@@ -10,7 +10,7 @@ contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
 
 ## Quick Links
 - [Vault Website](https://www.vaultproject.io)
-- [AliCloud Secrets Docs](https://www.vaultproject.io/docs/secrets/alicloud/index.html)
+- [AliCloud Secrets Docs](https://developer.hashicorp.com/vault/docs/secrets/alicloud)
 - [Vault Github](https://www.github.com/hashicorp/vault)
 - [General Announcement List](https://groups.google.com/forum/#!forum/hashicorp-announce)
 - [Discussion List](https://groups.google.com/forum/#!forum/vault-tool)
@@ -18,10 +18,10 @@ contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
 
 ## Usage
 
-This is a [Vault plugin](https://www.vaultproject.io/docs/internals/plugins.html)
+This is a [Vault plugin](https://developer.hashicorp.com/vault/docs/plugins)
 and is meant to work with Vault. This guide assumes you have already installed Vault
 and have a basic understanding of how Vault works. Otherwise, first read this guide on 
-how to [get started with Vault](https://www.vaultproject.io/intro/getting-started/install.html).
+how to [get started with Vault](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-install).
 
 If you are using Vault 11.0.1 or above, this plugin is packaged with Vault
 and by default can be enabled by running:
@@ -73,7 +73,7 @@ $ make dev
 ### Install Plugin in Vault
 
 Put the plugin binary into a location of your choice. This directory
-will be specified as the [`plugin_directory`](https://www.vaultproject.io/docs/configuration/index.html#plugin_directory)
+will be specified as the [`plugin_directory`](https://developer.hashicorp.com/vault/docs/configuration#plugin_directory)
 in the Vault config used to start the server.
 
 ```hcl
@@ -108,11 +108,14 @@ $ vault secrets enable --plugin-name='alicloudsecrets' --path="alicloud" plugin
 
 ### Tests
 
-This plugin has both integration tests, and acceptance tests.
+This plugin has both integration tests and acceptance tests.
 
-The integration tests are run by `$ make test` and rather than firing real
-API calls, they fire API calls at a local test server that returns expected
-responses.
+The integration tests fire API calls at a local test server that returns expected
+responses rather than firing real API calls. They are executed by the following:
+
+```sh
+$ make test
+```
 
 The acceptance tests fire real API calls, and are located in `acceptance_test.go`.
 These should be run once as a final step before placing a PR. Please see 
@@ -125,14 +128,20 @@ data behind. Therefore, please run the acceptance tests at your own risk.
 At the very least, we recommend running them in their own private
 account for whatever backend you're testing.
 
-To run the acceptance tests, after exporting the necessary environment variables, 
-from the home directory run `go test`:
+To run the acceptance tests, after exporting the necessary environment variables,
+execute the following from the home directory:
 
 ```sh
-$ go test
+$ make testacc
+```
+
+Or to execute only the acceptance tests:
+
+```sh
+./scripts/run_acceptance.sh
 ```
 
 ## Other Docs
 
-See up-to-date [docs](https://www.vaultproject.io/docs/secrets/alicloud/index.html)
-and general [API docs](https://www.vaultproject.io/api/secret/alicloud/index.html).
+See up-to-date [docs](https://developer.hashicorp.com/vault/docs/secrets/alicloud)
+and general [API docs](https://developer.hashicorp.com/vault/api-docs/secret/alicloud).
