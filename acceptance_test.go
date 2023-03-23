@@ -5,7 +5,6 @@ package alicloud
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -31,9 +30,6 @@ var runAcceptanceTests = os.Getenv(envVarRunAccTests) == "1"
 
 func TestAcceptanceDynamicPolicyBasedCreds(t *testing.T) {
 	if !runAcceptanceTests {
-		fmt.Printf("Skipped because runAccTest is %v   vault_acc: %v\n", runAcceptanceTests, os.Getenv("VAULT_ACC"))
-		val, set := os.LookupEnv("VAULT_ACC")
-		fmt.Printf("vault_acc is set: %v   the value is %v\n", set, val)
 		t.SkipNow()
 	}
 
@@ -51,9 +47,6 @@ func TestAcceptanceDynamicPolicyBasedCreds(t *testing.T) {
 
 func TestAcceptanceDynamicRoleBasedCreds(t *testing.T) {
 	if !runAcceptanceTests {
-		fmt.Printf("Skipped because runAccTest is %v   vault_acc: %v\n", runAcceptanceTests, os.Getenv("VAULT_ACC"))
-		val, set := os.LookupEnv("VAULT_ACC")
-		fmt.Printf("vault_acc is set: %v   the value is %v\n", set, val)
 		t.SkipNow()
 	}
 
