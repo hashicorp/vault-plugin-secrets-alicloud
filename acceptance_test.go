@@ -14,9 +14,9 @@ import (
 
 const (
 	envVarRunAccTests = "VAULT_ACC"
-	envVarAccessKey   = "VAULT_ACC_TEST_ACCESS_KEY_ID"
-	envVarSecretKey   = "VAULT_ACC_TEST_SECRET_KEY"
-	envVarRoleARN     = "VAULT_ACC_TEST_ROLE_ARN"
+	envVarAccessKey   = "VAULT_SECRETS_ACC_TEST_ACCESS_KEY_ID"
+	envVarSecretKey   = "VAULT_SECRETS_ACC_TEST_SECRET_KEY"
+	envVarRoleARN     = "VAULT_SECRETS_ACC_TEST_ROLE_ARN"
 	// Please note: the role arn used here for acceptance tests must have been set up as
 	// allowing trusted actors, as mentioned here: https://www.alibabacloud.com/help/en/resource-access-management/latest/edit-the-trust-policy-of-a-ram-role.
 	// Also, the access key and secret in use must qualify as a trusted actor. If you're
