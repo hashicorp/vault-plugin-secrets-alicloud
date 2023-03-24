@@ -40,9 +40,6 @@ mkdir -p bin/
 
 # Build!
 echo "==> Building..."
-echo "Running:"
-echo "${GO_CMD} build -gcflags ${GCFLAGS} -ldflags -X github.com/hashicorp/${TOOL}/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -o bin/${TOOL} -tags ${BUILD_TAGS} ."
-echo ""
 ${GO_CMD} build \
     -gcflags "${GCFLAGS}" \
     -ldflags "-X github.com/hashicorp/${TOOL}/version.GitCommit='${GIT_COMMIT}${GIT_DIRTY}'" \
