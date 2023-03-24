@@ -16,13 +16,13 @@ const (
 	envVarRunAccTests = "VAULT_ACC"
 	envVarAccessKey   = "VAULT_SECRETS_ACC_TEST_ACCESS_KEY_ID"
 	envVarSecretKey   = "VAULT_SECRETS_ACC_TEST_SECRET_KEY"
-	envVarRoleARN     = "VAULT_SECRETS_ACC_TEST_ROLE_ARN"
 	// Please note: the role arn used here for acceptance tests must have been set up as
 	// allowing trusted actors, as mentioned here: https://www.alibabacloud.com/help/en/resource-access-management/latest/edit-the-trust-policy-of-a-ram-role.
 	// Also, the access key and secret in use must qualify as a trusted actor. If you're
 	// unsure of how to set up a trusted actor, please create a new role in Alibaba's RAM UI,
 	// as its role creation wizard asks you whether you want to create trusted actors and how
 	// they should be configured. Trusted actors can only be added at the time of role creation.
+	envVarRoleARN = "VAULT_SECRETS_ACC_TEST_ROLE_ARN"
 )
 
 var runAcceptanceTests = os.Getenv(envVarRunAccTests) == "1"
