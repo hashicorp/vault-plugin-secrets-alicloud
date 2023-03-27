@@ -121,9 +121,9 @@ The acceptance tests fire real API calls, and are located in `acceptance_test.go
 These should be run once as a final step before placing a PR. The following environment
 variables will need to be set for the acceptance tests to run:
 * `VAULT_ACC=1`
-* `VAULT_ACC_TEST_ROLE_ARN`
-* `VAULT_ACC_TEST_ACCESS_KEY_ID`
-* `VAULT_ACC_TEST_SECRET_KEY`
+* `VAULT_SECRETS_ACC_TEST_ROLE_ARN`
+* `VAULT_SECRETS_ACC_TEST_ACCESS_KEY_ID`
+* `VAULT_SECRETS_ACC_TEST_SECRET_KEY`
 
 **Warning:** The acceptance tests create/destroy/modify *real resources*,
 which may incur real costs in some cases. In the presence of a bug,
