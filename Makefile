@@ -1,9 +1,7 @@
 TOOL?=vault-plugin-secrets-alicloud
 TEST?=$$(go list ./... | grep -v /vendor/ | grep -v teamcity)
 VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
-EXTERNAL_TOOLS=\
-	github.com/mitchellh/gox \
-	github.com/golang/dep/cmd/dep
+EXTERNAL_TOOLS=
 BUILD_TAGS?=${TOOL}
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 
@@ -21,6 +19,10 @@ dev: fmtcheck generate
 # test runs the unit tests and vets the code
 test: fmtcheck generate
 	CGO_ENABLED=0 VAULT_TOKEN= VAULT_ACC= go test -v -tags='$(BUILD_TAGS)' $(TEST) $(TESTARGS) -count=1 -timeout=20m -parallel=4
+
+# testacc runs both the unit tests and acceptance tests, and vets the code
+testacc: fmtcheck generate
+	CGO_ENABLED=0 VAULT_TOKEN= VAULT_ACC=1 go test -v -tags='$(BUILD_TAGS)' $(TEST) $(TESTARGS) -count=1 -timeout=20m -parallel=4
 
 testcompile: fmtcheck generate
 	@for pkg in $(TEST) ; do \
@@ -48,4 +50,4 @@ fmt:
 proto:
 	protoc *.proto --go_out=plugins=grpc:.
 
-.PHONY: bin default generate test vet bootstrap fmt fmtcheck
+.PHONY: bin default generate test testacc vet bootstrap fmt fmtcheck
