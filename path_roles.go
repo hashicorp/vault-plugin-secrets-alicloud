@@ -19,6 +19,11 @@ import (
 func (b *backend) pathListRoles() *framework.Path {
 	return &framework.Path{
 		Pattern: "role/?$",
+		DisplayAttrs: &framework.DisplayAttributes{
+			OperationPrefix: operationPrefixAliCloud,
+			OperationVerb:   "list",
+			OperationSuffix: "roles",
+		},
 		Callbacks: map[logical.Operation]framework.OperationFunc{
 			logical.ListOperation: b.operationRolesList,
 		},
@@ -30,6 +35,10 @@ func (b *backend) pathListRoles() *framework.Path {
 func (b *backend) pathRole() *framework.Path {
 	return &framework.Path{
 		Pattern: "role/" + framework.GenericNameRegex("name"),
+		DisplayAttrs: &framework.DisplayAttributes{
+			OperationPrefix: operationPrefixAliCloud,
+			OperationSuffix: "role",
+		},
 		Fields: map[string]*framework.FieldSchema{
 			"name": {
 				Type:        framework.TypeLowerCaseString,
