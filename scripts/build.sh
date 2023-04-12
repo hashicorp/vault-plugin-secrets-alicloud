@@ -45,7 +45,7 @@ ${GO_CMD} build \
     -ldflags "-X github.com/hashicorp/${TOOL}/version.GitCommit='${GIT_COMMIT}${GIT_DIRTY}'" \
     -o "bin/${TOOL}" \
     -tags "${BUILD_TAGS}" \
-    .
+    "${DIR}/cmd/${TOOL}"
 
 # Move all the compiled things to the $GOPATH/bin
 OLDIFS=$IFS
