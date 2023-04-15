@@ -19,6 +19,11 @@ import (
 func (b *backend) pathCreds() *framework.Path {
 	return &framework.Path{
 		Pattern: "creds/" + framework.GenericNameRegex("name"),
+		DisplayAttrs: &framework.DisplayAttributes{
+			OperationPrefix: operationPrefixAliCloud,
+			OperationVerb:   "generate",
+			OperationSuffix: "credentials",
+		},
 		Fields: map[string]*framework.FieldSchema{
 			"name": {
 				Type:        framework.TypeLowerCaseString,

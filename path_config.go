@@ -14,6 +14,9 @@ import (
 func (b *backend) pathConfig() *framework.Path {
 	return &framework.Path{
 		Pattern: "config",
+		DisplayAttrs: &framework.DisplayAttributes{
+			OperationPrefix: operationPrefixAliCloud,
+		},
 		Fields: map[string]*framework.FieldSchema{
 			"access_key": {
 				Type:        framework.TypeString,
@@ -24,14 +27,29 @@ func (b *backend) pathConfig() *framework.Path {
 				Description: "Secret key with appropriate permissions.",
 			},
 		},
-		Callbacks: map[logical.Operation]framework.OperationFunc{
+		Operations: map[logical.Operation]framework.OperationHandler{
 			// Your access key and secret are generated together at the same time,
 			// so you always need to clobber your previous ones. Thus, we don't need two separate operations.
 			// When we don't use an existence check, all operations come through as an update operation,
 			// which is why it's the one fulfilled here.
-			logical.UpdateOperation: b.operationConfigUpdate,
-			logical.ReadOperation:   b.operationConfigRead,
-			logical.DeleteOperation: b.operationConfigDelete,
+			logical.UpdateOperation: &framework.PathOperation{
+				Callback: b.operationConfigUpdate,
+				DisplayAttrs: &framework.DisplayAttributes{
+					OperationVerb: "configure",
+				},
+			},
+			logical.ReadOperation: &framework.PathOperation{
+				Callback: b.operationConfigRead,
+				DisplayAttrs: &framework.DisplayAttributes{
+					OperationSuffix: "configuration",
+				},
+			},
+			logical.DeleteOperation: &framework.PathOperation{
+				Callback: b.operationConfigDelete,
+				DisplayAttrs: &framework.DisplayAttributes{
+					OperationSuffix: "configuration",
+				},
+			},
 		},
 		HelpSynopsis:    pathConfigRootHelpSyn,
 		HelpDescription: pathConfigRootHelpDesc,
