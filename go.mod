@@ -3,7 +3,7 @@ module github.com/hashicorp/vault-plugin-secrets-alicloud
 go 1.20
 
 require (
-	github.com/aliyun/alibaba-cloud-sdk-go v1.62.521
+	github.com/aliyun/alibaba-cloud-sdk-go v1.62.533
 	github.com/hashicorp/go-hclog v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-uuid v1.0.3
