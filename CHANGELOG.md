@@ -3,8 +3,10 @@
 IMPROVEMENTS:
 * Updated dependencies:
    * `github.com/aliyun/alibaba-cloud-sdk-go` v1.62.673 -> v1.62.685
+   * `github.com/go-jose/go-jose/v3` v3.0.1 -> v3.0.3
    * `github.com/hashicorp/vault/api` v1.11.0 -> v1.12.0
    * `github.com/hashicorp/vault/sdk` v0.10.2 -> v0.11.0
+   * `google.golang.org/protobuf` v1.32.0 -> v1.33.0
 
 ## 0.16.0
 ### February 1, 2024
