@@ -1,8 +1,13 @@
 ## Unreleased
 
+## 0.17.0
+### May 20, 2024
+
+FEATURES:
+* bump `github.com/hashicorp/go-plugin` v1.5.2 -> v1.6.0 to enable running the plugin in containers
+
 IMPROVEMENTS:
-* Updated dependencies:
-   * `github.com/hashicorp/go-plugin` v1.5.2 -> v1.6.0 to enable running the plugin in containers
+* Updated dependencies: (https://github.com/hashicorp/vault-plugin-secrets-alicloud/pull/106)
 
 ## 0.16.0
 ### February 1, 2024
