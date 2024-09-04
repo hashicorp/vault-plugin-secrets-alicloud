@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.18.0
+### Sept 4, 2024
+
+IMPROVEMENTS:
+* Updated dependencies: (https://github.com/hashicorp/vault-plugin-secrets-alicloud/pull/108)
+
 ## 0.17.0
 ### May 20, 2024
 
