@@ -1,3 +1,13 @@
+## v0.21.0
+### October 2, 2025
+
+* update deps & go version (#134)
+* Automated dependency upgrades (#126)
+* init changie (#131)
+* Add backport assistant workflow (#129)
+* Add backport assistant workflow (#128)
+* [Compliance] - PR Template Changes Required (#127)
+
 ## 0.20.0
 ### May 29, 2025
 
