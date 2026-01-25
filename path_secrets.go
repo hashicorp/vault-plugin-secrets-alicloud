@@ -162,15 +162,15 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 		// These just need to be detached, but we're not going to delete them because they're
 		// supposed to be longstanding.
 		remotePolicies, err := getRemotePolicies(req.Secret.InternalData, "remote_policies")
-		if err != nil {
+
+		if err == nil {
 			// This shouldn't be part of the multierror because if it returns empty remote policies,
 			// then we won't go through the remotePolicies loop and we'll think we're successful
 			// when we actually didn't delete the remotePolicies we need to.
-			return nil, err
-		}
-		for _, remotePolicy := range remotePolicies {
-			if err := client.DetachPolicy(userName, remotePolicy.Name, remotePolicy.Type); err != nil {
-				apiErrs = multierror.Append(apiErrs, err)
+			for _, remotePolicy := range remotePolicies {
+				if err := client.DetachPolicy(userName, remotePolicy.Name, remotePolicy.Type); err != nil {
+					apiErrs = multierror.Append(apiErrs, err)
+				}
 			}
 		}
 
