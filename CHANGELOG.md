@@ -1,3 +1,11 @@
+## v0.22.0
+### March 18, 2026
+
+* prepare v0.22.0 release (#140)
+* [COMPLIANCE] Update Copyright and License Headers (#139)
+* chore: remove changie (#136)
+* Update changelog for v0.21.0 release (#135)
+
 ## Unreleased
 ## v0.22.0
 ### March 17, 2026
