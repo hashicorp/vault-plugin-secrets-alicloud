@@ -8,14 +8,12 @@ import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/ram"
 )
 
-func NewRAMClient(sdkConfig *sdk.Config, key, secret string) (*RAMClient, error) {
+func NewRAMClient(sdkConfig *sdk.Config, region, key, secret string) (*RAMClient, error) {
 	creds, err := chainedCreds(key, secret)
 	if err != nil {
 		return nil, err
 	}
-	// We hard-code a region here because there's only one RAM endpoint regardless of the
-	// region you're in.
-	client, err := ram.NewClientWithOptions("us-east-1", sdkConfig, creds)
+	client, err := ram.NewClientWithOptions(region, sdkConfig, creds)
 	if err != nil {
 		return nil, err
 	}
