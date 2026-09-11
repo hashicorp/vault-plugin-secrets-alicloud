@@ -1,3 +1,9 @@
+## v0.23.0
+### September 11, 2026
+
+* [VAULT-50064] Prepare v0.23.0 Release (#146)
+* updated dependencies to address secvuln (#144)
+
 ## Unreleased
 ## v0.22.0
 ### March 17, 2026
