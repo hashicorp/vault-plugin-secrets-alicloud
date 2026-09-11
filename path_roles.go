@@ -13,6 +13,7 @@ import (
 
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/vault/sdk/framework"
+	"github.com/hashicorp/vault/sdk/helper/custommetadata"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
@@ -68,6 +69,10 @@ to 0, in which case the value will fallback to the system/mount defaults.`,
 			"max_ttl": {
 				Type:        framework.TypeDurationSecond,
 				Description: "The maximum allowed lifetime of tokens issued using this role.",
+			},
+			"metadata": {
+				Type:        framework.TypeMap,
+				Description: "A map of string key-value pairs to associate with this role.",
 			},
 		},
 		ExistenceCheck: b.operationRoleExistenceCheck,
@@ -172,6 +177,19 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 	if raw, ok := data.GetOk("max_ttl"); ok {
 		role.MaxTTL = time.Duration(raw.(int)) * time.Second
 	}
+	if rawMeta, ok := data.GetOk("metadata"); ok {
+		cm, err := toStringMap(rawMeta)
+		if err != nil {
+			return logical.ErrorResponse("error parsing metadata: %s", err.Error()), nil
+		}
+		if err := custommetadata.Validate(cm); err != nil {
+			return logical.ErrorResponse(err.Error()), nil
+		}
+		role.Metadata = cm
+	}
+	if role.Metadata == nil {
+		role.Metadata = make(map[string]string)
+	}
 
 	// Now that the role is built, validate it.
 	if role.MaxTTL > 0 && role.TTL > role.MaxTTL {
@@ -231,6 +249,7 @@ func (b *backend) operationRoleRead(ctx context.Context, req *logical.Request, d
 			"inline_policies": role.InlinePolicies,
 			"ttl":             role.TTL / time.Second,
 			"max_ttl":         role.MaxTTL / time.Second,
+			"metadata":        role.Metadata,
 		},
 	}, nil
 }
@@ -295,11 +314,12 @@ func (t roleType) String() string {
 }
 
 type roleEntry struct {
-	RoleARN        string          `json:"role_arn"`
-	RemotePolicies []*remotePolicy `json:"remote_policies"`
-	InlinePolicies []*inlinePolicy `json:"inline_policies"`
-	TTL            time.Duration   `json:"ttl"`
-	MaxTTL         time.Duration   `json:"max_ttl"`
+	RoleARN        string            `json:"role_arn"`
+	RemotePolicies []*remotePolicy   `json:"remote_policies"`
+	InlinePolicies []*inlinePolicy   `json:"inline_policies"`
+	TTL            time.Duration     `json:"ttl"`
+	MaxTTL         time.Duration     `json:"max_ttl"`
+	Metadata       map[string]string `json:"metadata"`
 }
 
 func (r *roleEntry) Type() roleType {
