@@ -114,7 +114,7 @@ func (b *backend) operationRevoke(ctx context.Context, req *logical.Request, _ *
 		if creds == nil {
 			return nil, errors.New("unable to delete access key because no credentials are configured")
 		}
-		client, err := clients.NewRAMClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
+		client, err := clients.NewRAMClient(b.sdkConfig, creds.Region, creds.AccessKey, creds.SecretKey)
 		if err != nil {
 			return nil, err
 		}

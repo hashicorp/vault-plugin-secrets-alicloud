@@ -7,12 +7,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/vault/sdk/helper/jsonutil"
 	"math/rand"
 	"time"
 
 	"github.com/hashicorp/vault-plugin-secrets-alicloud/clients"
 	"github.com/hashicorp/vault/sdk/framework"
+	"github.com/hashicorp/vault/sdk/helper/jsonutil"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
@@ -64,7 +64,7 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 	switch role.Type() {
 
 	case roleTypeSTS:
-		client, err := clients.NewSTSClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
+		client, err := clients.NewSTSClient(b.sdkConfig, creds.Region, creds.AccessKey, creds.SecretKey)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		return resp, nil
 
 	case roleTypeRAM:
-		client, err := clients.NewRAMClient(b.sdkConfig, creds.AccessKey, creds.SecretKey)
+		client, err := clients.NewRAMClient(b.sdkConfig, creds.Region, creds.AccessKey, creds.SecretKey)
 		if err != nil {
 			return nil, err
 		}

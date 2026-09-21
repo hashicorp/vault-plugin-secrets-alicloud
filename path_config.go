@@ -18,6 +18,10 @@ func (b *backend) pathConfig() *framework.Path {
 			OperationPrefix: operationPrefixAliCloud,
 		},
 		Fields: map[string]*framework.FieldSchema{
+			"region": {
+				Type:        framework.TypeString,
+				Description: "The default region to use for API requests. If not set, the default region of 'us-east-1' will be used.",
+			},
 			"access_key": {
 				Type:        framework.TypeString,
 				Description: "Access key with appropriate permissions.",
@@ -59,6 +63,10 @@ func (b *backend) pathConfig() *framework.Path {
 func (b *backend) operationConfigUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// Access keys and secrets are generated in pairs. You would never need
 	// to update one or the other alone, always both together.
+	region := "us-east-1"
+	if regionIfc, ok := data.GetOk("region"); ok {
+		region = regionIfc.(string)
+	}
 	accessKey := ""
 	if accessKeyIfc, ok := data.GetOk("access_key"); ok {
 		accessKey = accessKeyIfc.(string)
@@ -72,6 +80,7 @@ func (b *backend) operationConfigUpdate(ctx context.Context, req *logical.Reques
 		return nil, errors.New("secret_key is required")
 	}
 	entry, err := logical.StorageEntryJSON("config", credConfig{
+		Region:    region,
 		AccessKey: accessKey,
 		SecretKey: secretKey,
 	})
@@ -116,7 +125,9 @@ func readCredentials(ctx context.Context, storage logical.Storage) (*credConfig,
 	if entry == nil {
 		return nil, nil
 	}
-	creds := &credConfig{}
+	creds := &credConfig{
+		Region: "us-east-1",
+	}
 	if err := entry.DecodeJSON(creds); err != nil {
 		return nil, err
 	}
@@ -124,6 +135,7 @@ func readCredentials(ctx context.Context, storage logical.Storage) (*credConfig,
 }
 
 type credConfig struct {
+	Region    string `json:"region"`
 	AccessKey string `json:"access_key"`
 	SecretKey string `json:"secret_key"`
 }
