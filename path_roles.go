@@ -60,6 +60,10 @@ as a trusted actor.`,
 				Description: `The name and type of each remote policy to be applied. 
 Example: "name:AliyunRDSReadOnlyAccess,type:System".`,
 			},
+			"username_template": {
+				Type:        framework.TypeString,
+				Description: "Go template for RAM usernames and STS role session names. Fields: .DisplayName, .RoleName, .UnixTime, and .Random.",
+			},
 			"ttl": {
 				Type: framework.TypeDurationSecond,
 				Description: `Duration in seconds after which the issued token should expire. Defaults
@@ -172,6 +176,9 @@ func (b *backend) operationRoleCreateUpdate(ctx context.Context, req *logical.Re
 	if raw, ok := data.GetOk("max_ttl"); ok {
 		role.MaxTTL = time.Duration(raw.(int)) * time.Second
 	}
+	if raw, ok := data.GetOk("username_template"); ok {
+		role.UsernameTemplate = raw.(string)
+	}
 
 	// Now that the role is built, validate it.
 	if role.MaxTTL > 0 && role.TTL > role.MaxTTL {
@@ -226,11 +233,12 @@ func (b *backend) operationRoleRead(ctx context.Context, req *logical.Request, d
 	}
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"role_arn":        role.RoleARN,
-			"remote_policies": role.RemotePolicies,
-			"inline_policies": role.InlinePolicies,
-			"ttl":             role.TTL / time.Second,
-			"max_ttl":         role.MaxTTL / time.Second,
+			"role_arn":          role.RoleARN,
+			"remote_policies":   role.RemotePolicies,
+			"inline_policies":   role.InlinePolicies,
+			"username_template": role.UsernameTemplate,
+			"ttl":               role.TTL / time.Second,
+			"max_ttl":           role.MaxTTL / time.Second,
 		},
 	}, nil
 }
@@ -295,11 +303,12 @@ func (t roleType) String() string {
 }
 
 type roleEntry struct {
-	RoleARN        string          `json:"role_arn"`
-	RemotePolicies []*remotePolicy `json:"remote_policies"`
-	InlinePolicies []*inlinePolicy `json:"inline_policies"`
-	TTL            time.Duration   `json:"ttl"`
-	MaxTTL         time.Duration   `json:"max_ttl"`
+	RoleARN          string          `json:"role_arn"`
+	RemotePolicies   []*remotePolicy `json:"remote_policies"`
+	InlinePolicies   []*inlinePolicy `json:"inline_policies"`
+	UsernameTemplate string          `json:"username_template,omitempty"`
+	TTL              time.Duration   `json:"ttl"`
+	MaxTTL           time.Duration   `json:"max_ttl"`
 }
 
 func (r *roleEntry) Type() roleType {

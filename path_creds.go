@@ -7,12 +7,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/vault/sdk/helper/jsonutil"
-	"math/rand"
 	"time"
+
+	"github.com/hashicorp/vault/sdk/helper/jsonutil"
 
 	"github.com/hashicorp/vault-plugin-secrets-alicloud/clients"
 	"github.com/hashicorp/vault/sdk/framework"
+	vaulttemplate "github.com/hashicorp/vault/sdk/helper/template"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
@@ -68,7 +69,12 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		if err != nil {
 			return nil, err
 		}
-		assumeRoleResp, err := client.AssumeRole(generateRoleSessionName(req.DisplayName, roleName), role.RoleARN)
+		// The max length of a role session name per AliCloud is 32.
+		sessionName, err := generateNameWithTemplate(role.UsernameTemplate, req.DisplayName, roleName, sessionUserType)
+		if err != nil {
+			return nil, err
+		}
+		assumeRoleResp, err := client.AssumeRole(sessionName, role.RoleARN)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +118,12 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 		*/
 		success := false
 
-		createUserResp, err := client.CreateUser(generateUsername(req.DisplayName, roleName))
+		// The max length of a ram user name per AliCloud is 64.
+		userName, err := generateNameWithTemplate(role.UsernameTemplate, req.DisplayName, roleName, ramUserType)
+		if err != nil {
+			return nil, err
+		}
+		createUserResp, err := client.CreateUser(userName)
 		if err != nil {
 			return nil, err
 		}
@@ -249,26 +260,44 @@ func (b *backend) operationCredsRead(ctx context.Context, req *logical.Request, 
 	}
 }
 
-// The max length of a username per AliCloud is 64.
-func generateUsername(displayName, roleName string) string {
-	return generateName(displayName, roleName, 64)
+type usernameTemplateData struct {
+	Type        string
+	DisplayName string
+	RoleName    string
 }
 
-// The max length of a role session name per AliCloud is 32.
-func generateRoleSessionName(displayName, roleName string) string {
-	return generateName(displayName, roleName, 32)
-}
-
-func generateName(displayName, roleName string, maxLength int) string {
-	name := fmt.Sprintf("%s-%s-", displayName, roleName)
-
-	// The time and random number take up to 15 more in length, so if the name
-	// is too long we need to trim it.
-	if len(name) > maxLength-15 {
-		name = name[:maxLength-15]
+func generateNameWithTemplate(usernameTemplate, displayName, roleName string, userType string) (string, error) {
+	maxLength := 64
+	if userType == sessionUserType {
+		maxLength = 32
 	}
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return fmt.Sprintf("%s%d-%d", name, time.Now().Unix(), r.Intn(10000))
+
+	if usernameTemplate == "" {
+		usernameTemplate = defaultUsernameTemplate
+	}
+
+	tmpl, err := vaulttemplate.NewTemplate(vaulttemplate.Template(usernameTemplate))
+	if err != nil {
+		return "", fmt.Errorf("invalid username_template: %w", err)
+	}
+
+	data := usernameTemplateData{
+		Type:        userType,
+		DisplayName: displayName,
+		RoleName:    roleName,
+	}
+
+	name, err := tmpl.Generate(data)
+	if err != nil {
+		return "", fmt.Errorf("failed to render username_template: %w", err)
+	}
+	if name == "" {
+		return "", errors.New("username_template generated an empty username")
+	}
+	if len(name) > maxLength {
+		return "", fmt.Errorf("username_template generated a name longer than %d characters", maxLength)
+	}
+	return name, nil
 }
 
 const pathCredsHelpSyn = `
@@ -286,3 +315,7 @@ be renewed or revoked as described here:
 https://www.vaultproject.io/docs/concepts/lease.html,
 but STS credentials do not support renewal or revocation.
 `
+
+const ramUserType = "RAM"
+const sessionUserType = "STS"
+const defaultUsernameTemplate = `{{ if (eq .Type "STS") }}{{ printf "vault-%s-%s"  (unix_time) (random 20) | truncate 32 }}{{ else }}{{ printf "vault-%s-%s-%s" (printf "%s-%s" (.DisplayName) (.RoleName) | truncate 42) (unix_time) (random 20) | truncate 64 }}{{ end }}`

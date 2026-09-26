@@ -148,7 +148,8 @@ func (e *testEnv) AddPolicyBasedRole(t *testing.T) {
 				"name:AliyunOSSReadOnlyAccess,type:System",
 				"name:AliyunRDSReadOnlyAccess,type:System",
 			},
-			"inline_policies": rawInlinePolicies,
+			"inline_policies":   rawInlinePolicies,
+			"username_template": "{{.RoleName}}_{{random 20}}",
 		},
 	}
 	resp, err := e.Backend.HandleRequest(e.Context, req)
@@ -236,6 +237,9 @@ func (e *testEnv) ReadPolicyBasedRole(t *testing.T) {
 	maxTTL := fmt.Sprintf("%d", resp.Data["max_ttl"])
 	if maxTTL != "0" {
 		t.Fatalf("expected max_ttl of 0 but received %s", maxTTL)
+	}
+	if usernameTemplate, ok := resp.Data["username_template"].(string); !ok || usernameTemplate != "{{.RoleName}}_{{random 20}}" {
+		t.Fatalf("expected username_template to be persisted but received %#v", resp.Data["username_template"])
 	}
 }
 
