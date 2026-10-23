@@ -1,3 +1,9 @@
+## v0.23.1
+### October 23, 2026
+
+* VAULT-50039: upgrade Go version and dependencies to resolve security vulnerabilities (#149)
+* [CHANGELOG] Prepare for v0.23.0 release (#147)
+
 ## v0.23.0
 ### September 11, 2026
 
